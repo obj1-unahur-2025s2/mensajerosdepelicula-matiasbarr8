@@ -1,9 +1,117 @@
-import example.pepita
+import mensajeros.*
+import vehiculos.*
+import destinos.*
+import paquetes.*
+import empresaMensajeria.*
 
-describe "group of tests for pepita" {
 
-  test "pepita has initial energy" {
-    assert.equals(100, pepita.energy())
+describe "Primera parte: Destinos y mensajeros" {
+  test "Que roberto puede llevar un paquete que está pago en un camión que tiene un acoplado." {
+    roberto.cambiarVehiculo(camion)
+    paquete.pagar(50)
+    roberto.entregarPaqueteEn(paquete, puenteDeBrooklyn)
+    assert.equals(true, roberto.entregarPaqueteEn(paquete, puenteDeBrooklyn))
+  }
+  test "Que neo con crédito no puede llevar un paquete que no está pago a la matrix." {
+    neo.cargarCredito()
+    neo.entregarPaqueteEn(paquete, laMatrix)
+    assert.equals(false, neo.entregarPaqueteEn(paquete, laMatrix))
+  }
+}
+describe "Segunda parte: Empresa de mensajería" {
+  test "Contratar a un mensajero" {
+    empresa.contratarMensajero(roberto)
+    assert.equals([roberto], empresa.mensajeros())
+  }
+  test "Despedir a un mensajero" {
+    empresa.contratarMensajero(neo)
+    empresa.despedirMensajero(neo)
+    assert.equals([], empresa.mensajeros())
+  }
+  test "Despedir a todos" {
+    empresa.contratarMensajero(roberto)
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(chuckNorris)
+    empresa.despedirATodos()
+    assert.equals([], empresa.mensajeros())
+  }
+  test "Analizar si la mensajeria es grande (si tiene mas de dos mensajeros)" {
+    empresa.contratarMensajero(roberto)
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(chuckNorris)
+    empresa.esGrande()
+    assert.equals(true, empresa.esGrande())
+  }
+  test "Consultar si el paquete pagado puede ser entregado por el primer empleado de la empresa de mensajería." {
+    empresa.contratarMensajero(roberto)
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(chuckNorris)
+    paquete.pagar(50)
+    empresa.puedeEntregarElPrimerMensajero(paquete, puenteDeBrooklyn)
+    assert.equals(true, empresa.puedeEntregarElPrimerMensajero(paquete, puenteDeBrooklyn))
+  }
+  test "Saber el peso del último mensajero de la empresa." {
+    empresa.contratarMensajero(roberto)
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(chuckNorris)
+    empresa.pesoDelUltimoMensajero()
+    assert.equals(80, empresa.pesoDelUltimoMensajero())
+  }
+}
+describe "Tercera parte: Mensajería recargada" {
+  test "Averiguar si un paquete puede ser entregado por la empresa de mensajería, es decir, si al menos uno de sus mensajeros puede entregar el paquete." {
+    empresa.contratarMensajero(roberto)
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(chuckNorris)
+    paquete.pagar(50)
+    empresa.algunMensajeroPuedeEntregar(paquete,puenteDeBrooklyn)
+    assert.equals(true, empresa.algunMensajeroPuedeEntregar(paquete,puenteDeBrooklyn))
+
+  }
+  test "Obtener todos los mensajeros que pueden llevar un paquete pagado." {
+    empresa.contratarMensajero(roberto)
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(chuckNorris)
+    paquete.pagar(50)
+    empresa.mensajerosQuePuedenLlevarUnPaquete(paquete,puenteDeBrooklyn)
+    assert.equals(empresa.mensajeros(), empresa.mensajerosQuePuedenLlevarUnPaquete(paquete,puenteDeBrooklyn))
   }
 
+  test "Saber si una mensajería tiene sobrepeso. Esto sucede si el promedio del peso de los mensajeros es superior a 500 Kg" {
+    empresa.contratarMensajero(roberto)
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(chuckNorris)
+    empresa.haySobrepeso()
+    assert.equals(false, empresa.haySobrepeso())
+  }
+  test "Hacer que la empresa de mensajería envíe un paquete. Para ello elige cualquier mensajero entre los que pueden enviarlo y si no puede lo agrega a los paquetes pendientes. " {
+    empresa.contratarMensajero(roberto)
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(chuckNorris)
+    paquete.pagar(50)
+    empresa.elegirUnMensajeroYEnviarSinoPonerPendiente(paquete, puenteDeBrooklyn)
+    assert.equals(roberto, empresa.elegirUnMensajeroYEnviarSinoPonerPendiente(paquete, puenteDeBrooklyn))
+  }
+  test "Conocer la facturación de la empresa, que es el total ganado por los paquetes enviados." {
+    empresa.contratarMensajero(roberto)
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(chuckNorris)
+    paquete.pagar(50)
+    empresa.elegirUnMensajeroYEnviarSinoPonerPendiente(paquete,puenteDeBrooklyn)
+    empresa.elegirUnMensajeroYEnviarSinoPonerPendiente(paquetito,puenteDeBrooklyn)
+    paquete.pagar(50)
+    empresa.elegirUnMensajeroYEnviarSinoPonerPendiente(paquete,puenteDeBrooklyn)
+    empresa.gananciaTotal()
+    assert.equals(210, empresa.gananciaTotal())
+  }
+
+  test "Dado un conjunto de paquetes, enviarlos a todos." {
+    empresa.contratarMensajero(roberto)
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(chuckNorris)
+    empresa.agregarPaquetePagadoAPendientes(paquetito)
+    empresa.agregarPaquetePagadoAPendientes(paquete)
+    empresa.enviarTodos()
+    assert.equals(empresa.paquetesPendientes(), empresa.paquetesPendientes())
+  }
 }
